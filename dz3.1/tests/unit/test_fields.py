@@ -5,18 +5,7 @@ import functools
 
 import api
 
-
-def cases(cases):
-    def decorator(f):
-        @functools.wraps(f)
-        def wrapper(*args):
-            for c in cases:
-                new_args = args + (c if isinstance(c, tuple) else (c,))
-                f(*new_args)
-
-        return wrapper
-
-    return decorator
+from store import cases
 
 
 class TestCharFieldSuite(unittest.TestCase):
@@ -137,5 +126,4 @@ class TestClientIDsFieldSuite(unittest.TestCase):
         None
     ])
     def test_clientidsfield_invalid(self, value):
-        self.assertRaises(ValueError, api.ClientIDsField().run_validators,
-                          value)
+        self.assertRaises(ValueError, api.ClientIDsField().run_validators, value)

@@ -4,12 +4,29 @@ import functools
 
 from redis import ConnectionError, TimeoutError
 
-MAX_TRIES = 3
-TIMEOUT_RATE = 2
-RETRY_EXCEPTIONS = (TimeoutError, ConnectionError)
+
+# MAX_TRIES = 3
+# TIMEOUT_RATE = 2
+# RETRY_EXCEPTIONS = (TimeoutError, ConnectionError)
 
 
-def retry(exceptions=RETRY_EXCEPTIONS, tries=MAX_TRIES, rate=TIMEOUT_RATE):
+def cases(cases):
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapper(*args):
+            for c in cases:
+                new_args = args + (c if isinstance(c, tuple) else (c,))
+                try:
+                    f(*new_args)
+                except Exception as e:
+                    raise Exception("{}. CASE: {}".format(str(e), c))
+
+        return wrapper
+
+    return decorator
+
+
+def retry(exceptions, tries, rate):
     def decorator(f):
         @functools.wraps(f)
         def wrapper(*args, **kwargs):
@@ -41,23 +58,24 @@ class RedisStore:
 
     def get(self, key):
         try:
-            tmp = self._cache.get(key)
-            return tmp
+            return self._cache.get(key)
         except (ConnectionError, TimeoutError):
             raise StoreCacheError
 
     def set(self, key, value, expire=None):
         try:
-            self._cache.set(key, value, expire)
+            return self._cache.set(key, value, expire)
         except (ConnectionError, TimeoutError):
             raise StoreCacheError
-        return self
 
 
 class Store:
 
-    def __init__(self, storage):
+    def __init__(self, storage, exceptions, tries, rate):
         self._storage = storage
+        self.exceptions = exceptions
+        self.tries = tries
+        self.rate = rate
 
     def get(self, key):
         return self._storage.get(key)
@@ -66,11 +84,17 @@ class Store:
         self._storage.set(key, value, expire)
         return self
 
-    @retry()
     def cache_get(self, key):
-        return self.get(key)
+        @retry(self.exceptions, self.tries, self.rate)
+        def _cache_get():
+            return self.get(key)
 
-    @retry()
+        return _cache_get()
+
     def cache_set(self, key, value, expire=None):
-        self.set(key, value, expire)
-        return self
+        @retry(self.exceptions, self.tries, self.rate)
+        def _cache_set():
+            self.set(key, value, expire)
+            return self
+
+        return _cache_set()

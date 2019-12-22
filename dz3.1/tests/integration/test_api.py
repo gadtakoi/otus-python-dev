@@ -5,27 +5,14 @@ import functools
 
 import api
 
-from store import Store, RedisStore
-
-
-def cases(cases):
-    def decorator(f):
-        @functools.wraps(f)
-        def wrapper(*args):
-            for c in cases:
-                new_args = args + (c if isinstance(c, tuple) else (c,))
-                f(*new_args)
-
-        return wrapper
-
-    return decorator
+from store import Store, RedisStore, cases
 
 
 class TestScoreSuite(unittest.TestCase):
     def setUp(self):
         self.context = {}
         self.headers = {}
-        self.store = Store(RedisStore())
+        self.store = Store(RedisStore(), 3, 2, (TimeoutError, ConnectionError))
 
     def get_response(self, request):
         return api.method_handler({"body": request, "headers": self.headers},
@@ -131,7 +118,7 @@ class TestInterestSuite(unittest.TestCase):
     def setUp(self):
         self.context = {}
         self.headers = {}
-        self.store = Store(RedisStore())
+        self.store = Store(RedisStore(), 3, 2, (TimeoutError, ConnectionError))
 
     def get_response(self, request):
         return api.method_handler({"body": request, "headers": self.headers},
