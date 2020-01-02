@@ -5,11 +5,6 @@ import functools
 from redis import ConnectionError, TimeoutError
 
 
-# MAX_TRIES = 3
-# TIMEOUT_RATE = 2
-# RETRY_EXCEPTIONS = (TimeoutError, ConnectionError)
-
-
 def cases(cases):
     def decorator(f):
         @functools.wraps(f)
