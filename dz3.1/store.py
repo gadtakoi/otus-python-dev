@@ -42,13 +42,14 @@ class StoreCacheError(Exception):
 
 
 class RedisStore:
-    def __init__(self, port=6379, timeout=10):
+    def __init__(self, port=6379, timeout=10, retry_on_timeout=5):
         self._cache = redis.StrictRedis(
             host='localhost',
             port=port,
             decode_responses=True,
             socket_timeout=timeout,
-            socket_connect_timeout=timeout
+            socket_connect_timeout=timeout,
+            retry_on_timeout=retry_on_timeout
         )
 
     def get(self, key):
