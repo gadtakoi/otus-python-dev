@@ -78,10 +78,10 @@ def _socket():
 
 
 def start():
-    sock = _socket()
     signal.signal(signal.SIGINT, _terminate)
     signal.signal(signal.SIGTERM, _terminate)
     for _ in range(workers_count):
+        sock = _socket()
         worker = mp.Process(target=_serve, kwargs=dict(sock=sock))
         worker.daemon = True
         worker.start()
@@ -219,5 +219,6 @@ if __name__ == "__main__":
     address = '127.0.0.1'
     port = opts.port
     root_path = os.path.abspath(opts.rootdir)
+    _prepare_response('root_path', root_path)
     workers_count = workers
     start()
