@@ -1,0 +1,4 @@
+<h2>Trending</h2>
+{% for p in popular %}
+<div class="p-2"><a href="/question/{{ p.id }}/" class="badge badge-secondary">{{ p.vote_count }}</a> <a href="/question/{{ p.id }}/" class="text-dark">{{ p.title }}</a></div>
+{% endfor %}

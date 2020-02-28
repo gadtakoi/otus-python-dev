@@ -1,0 +1,22 @@
+{% extends 'qna/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row mt-2">
+        <div class="col-9">
+            <h1>Settings</h1>
+        </div>
+        <div class="col">
+            {% include "qna/include/ask_button.html" %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-9">
+            {% include "qna/include/settings_form.html" %}
+        </div>
+        <div class="col-3">
+            {% include "qna/include/trending.html" %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

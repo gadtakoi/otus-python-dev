@@ -1,0 +1,29 @@
+<form method="post" action="{% if form %}{% else %}/question/add/{% endif %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="title" class="col-form-label">Title:</label>
+        <input type="text" class="form-control" id="title" name="title" required value="{{ form.title.value }}">
+    </div>
+    <div class="form-group">
+        <label for="content" class="col-form-label">Question:</label>
+        <textarea rows="4" class="form-control" id="content" name="content" required>{{ form.content.value }}</textarea>
+    </div>
+    <div class="form-group">
+        <label for="tags" class="col-form-label">Tags:   {{tagz}} </label>
+        <select class="form-control1" multiple="multiple" name="tags" id="tags">
+            {% for tag in tags %}
+                <option value="{{ tag.id }}" {% if tag.id in current_tags %} selected {% endif %} >{{ tag }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="modal-footer">
+        {% if form %}
+        <button type="submit" class="btn btn-primary">Save</button>
+        {% else %}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Ask</button>
+        {% endif %}
+    </div>
+</form>
+
+

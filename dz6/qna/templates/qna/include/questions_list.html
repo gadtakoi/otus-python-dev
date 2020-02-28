@@ -1,0 +1,20 @@
+<div class="row">
+    <div class="col-9">
+        {% for question in questions %}
+        <div class="row">
+            <div class="col-1 text-center">{{ question.vote_count }}<br><small class="text-muted">Votes</small></div>
+            <div class="col-1 text-center">{{ question.answer_set.count }}<br><small class="text-muted">Answers</small></div>
+            <div class="col-8"><a href="/question/{{question.id}}/">{{ question.title }}</a><br>
+                {% for tag in question.tags.all %}
+                <a href="/tag/{{ tag.name }}/" class="badge badge-secondary">{{ tag }}</a>
+                {% endfor %}
+            </div>
+            <div class="col">
+                {{ question.author.get_full_name }}<br>
+                <small class="text-muted">asked {{ question.date_create|timesince }} ago</small>
+            </div>
+        </div>
+        <div><hr></div>
+        {% endfor %}
+    </div>
+</div>

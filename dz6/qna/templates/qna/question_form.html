@@ -1,0 +1,24 @@
+{% extends 'qna/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row mt-2">
+        <div class="col-9">
+            {% if question.id %}
+            <h1>Edit a question </h1>
+            {% else %}
+            <h1>Ask a question </h1>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-9">
+            {% include "qna/include/ask_form.html" %}
+        </div>
+        <div class="col-3">
+            {% include "qna/include/trending.html" %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'qna/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row mt-2">
+        <div class="col-9">
+            <h1>{{ question.title }}</h1>
+            {% if question.author == request.user %}<a href="/question/{{ question.id }}/edit/">edit</a>{% endif %}
+        </div>
+        <div class="col-2">
+            {% include "qna/include/ask_button.html" %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-9">
+            <div class="row">
+                <div class="col-1">
+
+                    <div class="row text-center">
+                        <div class="col-1 text-center"><a class="#" data-question-id="{{question.id}}" id="questionvoteup"><i class="fa fa-angle-up fa-2x"></i></a></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-1 text-center ml-1" id="question_votes_count">{{ question.vote_count }}</div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-1 text-center"><a class="#" data-question-id="{{question.id}}" id="questionvotedown"><i class="fa fa-angle-down fa-2x"></i></a></div>
+                    </div>
+
+                </div>
+                <div class="col">
+                    {{ question.content }}
+                    <div class="row">
+                        <div class="col-9">
+                            {% for tag in question.tags.all %}
+                            <a href="/tag/{{ tag.name }}/" class="badge badge-secondary">{{ tag }}</a>
+                            {% endfor %}
+
+                        </div>
+                        <div class="col-2 text-right">
+                            {% if question.author.avatar_view %}
+                            <img src="{{ question.author.avatar_view }}" width="50px"/>
+                            {% endif %}
+                            <a href="/author/{{ question.author.id }}/">{{ question.author }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% for a in question.answers %}
+            <hr>
+            <div class="row">
+                <div class="col-1">
+
+                    <div class="row text-center">
+                        <div class="col-1 text-center"><a class="#" data-question-id="{{question.id}}"
+                                                          onclick="voteAnswer(this); return false;"
+                                                          data-answer-id="{{ a.id }}"
+                                                          data-answer-v="up" title="Vote Up">
+                            <i class="fa fa-angle-up fa-2x"></i></a></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-1 text-center ml-1" id="a_votes_count_{{a.id}}">{{ a.vote_count }}</div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-1 text-center"><a class="#" data-question-id="{{question.id}}"
+                                                          onclick="voteAnswer(this); return false;"
+                                                          data-answer-id="{{ a.id }}"
+                                                          data-answer-v="down" title="Vote Down">
+                            <i class="fa fa-angle-down fa-2x"></i></a></div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-1 text-center answer-correct"><a class="#"
+                                                          onclick="correctAnswer(this); return false;"
+                                                          data-answer-id="{{ a.id }}" title="Correct answer">
+                            <i class="fa
+                            {% if a.correct %}fa-star{% else %}fa-star-o{% endif %}
+                            answer_correct_{{ a.id }}" aria-hidden="true"></i>
+                        </a>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="col">
+                    {{ a.content }}
+                    <div class="row">
+                        <div class="col-9">
+                        </div>
+                        <div class="col-2 text-right">
+                            {% if a.author.avatar_view %}
+                            <img src="{{ a.author.avatar_view }}" width="50px"/>
+                            {% endif %}
+
+                            <a href="/author/{{ a.author.id }}/">{{ a.author }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% if user.is_authenticated %}
+            <hr>
+            <div class="row">
+                <div class="col">
+                    <h3>Your answer</h3>
+                    {% include "qna/include/answer_form.html" %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-3">
+            {% include "qna/include/trending.html" %}
+        </div>
+    </div>
+    {% include "qna/include/paginator.html" with questions=question.answers %}
+</div>
+{% endblock %}

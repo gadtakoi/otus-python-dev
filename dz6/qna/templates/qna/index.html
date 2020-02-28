@@ -1,0 +1,26 @@
+{% extends 'qna/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row mt-2">
+        <div class="col-9">
+            <h1>
+                <a href="/"><span class="{% if variant != 'hot' %}text-muted{% endif %}">New questions</span></a> |
+                <a href="/hot/"><span class="{% if variant == 'hot' %}text-muted{% endif %}">Hot questions</span></a>
+            </h1>
+        </div>
+        <div class="col">
+            {% include "qna/include/ask_button.html" %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-9">
+            {% include "qna/include/questions_list.html" %}
+        </div>
+        <div class="col-3">
+            {% include "qna/include/trending.html" %}
+        </div>
+    </div>
+    {% include "qna/include/paginator.html" %}
+</div>
+
+{% endblock %}
