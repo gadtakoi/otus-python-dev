@@ -175,7 +175,9 @@ def _prepare_response(document_path, headers):
     normpath = os.path.normpath(document_path)
     full_path = os.path.join(root_path, normpath)
     if '/..' in full_path:
-        return Codes.FORBIDDEN, headers
+        clear_path = os.path.normpath(full_path)
+        if not clear_path.startswith(root_path):
+            return Codes.FORBIDDEN, headers
     file_exists = os.path.exists(full_path)
     if not file_exists:
         return Codes.NOT_FOUND, headers
