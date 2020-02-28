@@ -25,7 +25,7 @@ source venv/bin/activate
 
 ### Setup project
 ```shell script
-pip install -r requirements/base.txt
+pip install -r requirements.txt
 ```
 
 ```shell script
