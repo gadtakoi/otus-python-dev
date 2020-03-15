@@ -2,7 +2,8 @@ from django.core.management.base import BaseCommand
 from faker import Faker
 from random import randint
 
-from qna.models import User, Tag, Question, Answer
+from qna.models import Tag, Question, Answer
+from customuser.models import User
 
 
 class Command(BaseCommand):

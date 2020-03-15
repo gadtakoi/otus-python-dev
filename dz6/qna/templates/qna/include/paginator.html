@@ -10,7 +10,7 @@
             {% if questions.number == i %}
                 <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
             {% else %}
-                <li><a class="page-link"  href="?page={{ i }}{{ tail }}">{{ i }}</a></li>
+                <li><a class="page-link" href="?page={{ i }}{{ tail }}">{{ i }}</a></li>
             {% endif %}
         {% endfor %}
         {% if questions.has_next %}
