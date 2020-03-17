@@ -41,6 +41,18 @@ class Question(models.Model):
     def show_tags(self):
         return self.tags.all()
 
+    def get_vote_url(self):
+        return reverse('question-vote', kwargs={'pk': self.pk})
+
+    def save(self, tags=(), *args, **kwargs):
+        super(Question, self).save(*args, **kwargs)
+        tag_objects = []
+        for tag in tags:
+            tag_object, _ = Tag.objects.get_or_create(name=tag)
+            tag_objects.append(tag_object)
+        if tag_objects:
+            self.tags.add(*tag_objects)
+
     class Meta:
         verbose_name = 'Вопрос'
         verbose_name_plural = 'Вопросы'
@@ -62,6 +74,12 @@ class Answer(models.Model):
 
     correct = models.BooleanField(verbose_name='Правильный ответ', default=False)
     sent = models.BooleanField(verbose_name='Письмо отправлено', default=False)
+
+    def get_vote_url(self):
+        return reverse('answer-vote', kwargs={'pk': self.pk})
+
+    def get_correct_url(self):
+        return reverse('answer-correct', kwargs={'pk': self.pk})
 
     def __str__(self):
         return self.content[:40]

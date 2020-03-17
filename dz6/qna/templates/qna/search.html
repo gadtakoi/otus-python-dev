@@ -11,7 +11,11 @@
     </div>
     <div class="row">
         <div class="col-9">
+            {% if questions %}
             {% include "qna/include/questions_list.html" %}
+            {% else %}
+            <h4>{{ q }} not found!</h4>
+            {% endif %}
             {% include "qna/include/paginator.html" %}
         </div>
         <div class="col-3">

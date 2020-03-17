@@ -2,9 +2,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import UpdateView
 
@@ -15,7 +16,6 @@ from qna.utils import send_email_answer_alert
 
 
 class IndexView(View):
-
     def get(self, request, **kwargs):
         variant = kwargs.get('variant', '')
         page_num = request.GET.get('page', 1)
@@ -42,8 +42,8 @@ class IndexView(View):
 
 
 class AskView(View):
-    @login_required
-    def get(self, request):
+    @method_decorator(login_required)
+    def post(self, request):
         q = Question(author=request.user)
         form = QuestionForm(request.POST, instance=q)
         if form.is_valid():
@@ -120,8 +120,8 @@ class QuestionUpdate(UpdateView):
 
 
 class AnswerView(View):
-    @login_required
-    def get(self, request, **kwargs):
+    @method_decorator(login_required)
+    def post(self, request, **kwargs):
         question_id = kwargs.get('pk', '')
         form = AnswerForm(request.POST)
         if form.is_valid():
@@ -139,44 +139,30 @@ class AnswerView(View):
 
 
 class AnswerCorrectView(View):
-    @login_required
-    def get(request, **kwargs):
-        answer_id = int(kwargs.get('pk', ''))
-        answer = Answer.objects.get(id=answer_id)
-        if answer.question.author == request.user:
-            Answer.objects.filter(question__id=answer.question.id).update(correct=False)
-            answer.correct = True
-            answer.save()
-            out = {'state': 'ok', 'answer_id': answer.id}
+    def post(self, request, pk):
+        if request.user.is_authenticated:
+            answer_id = int(pk)
+            answer = Answer.objects.get(id=answer_id)
+            if answer.question.author == request.user:
+                Answer.objects.filter(question__id=answer.question.id).update(correct=False)
+                answer.correct = True
+                answer.save()
+                out = {'state': 'ok', 'answer_id': answer.id}
+            else:
+                out = {'state': 'error'}
+            return JsonResponse(out)
         else:
-            out = {'state': 'error'}
-
-        return JsonResponse(out)
+            return HttpResponseForbidden()
 
 
-class QuestionVoteView(View):
-    @login_required
-    def get(self, request, **kwargs):
-        _id = kwargs.get('pk', '')
-        out = AnswerVoteView._vote_changer(Question, _id, request)
-        return JsonResponse(out)
-
-
-class AnswerVoteView(View):
-    @login_required
-    def answer_vote(request, **kwargs):
-        _id = kwargs.get('pk', '')
-        out = AnswerVoteView._vote_changer(Answer, _id, request)
-        return JsonResponse(out)
-
-    @staticmethod
-    def _vote_changer(cls, pk: str, request):
+class VoteChanger:
+    def _vote_changer(self, cls, pk: str, request):
         object_id = pk
         v = request.GET.get('v', '')
         out = {'state': 'error'}
         if object_id and v:
             instance = cls.objects.get(id=int(object_id))
-            allow_to_vote = AnswerVoteView._vote_processing(request, instance, v)
+            allow_to_vote = self._vote_processing(request, instance, v)
             if allow_to_vote:
                 if v == 'down':
                     instance.vote_count -= 1
@@ -186,15 +172,13 @@ class AnswerVoteView(View):
                 out = {'state': 'ok'}
         return out
 
-    @staticmethod
-    def _vote_processing(request, obj, v: str) -> bool:
+    def _vote_processing(self, request, obj, v: str) -> bool:
         allow_to_vote = False
 
         if v == 'up':
             sign = 1
         else:
             sign = -1
-
         new_vote = {'author': request.user, 'value': sign}
         try:
             if isinstance(obj, Question):
@@ -216,3 +200,21 @@ class AnswerVoteView(View):
             vote.save()
             allow_to_vote = True
         return allow_to_vote
+
+
+class QuestionVoteView(View, VoteChanger):
+    def post(self, request, pk):
+        if request.user.is_authenticated:
+            out = self._vote_changer(Question, pk, request)
+            return JsonResponse(out)
+        else:
+            return HttpResponseForbidden()
+
+
+class AnswerVoteView(View, VoteChanger):
+    def post(self, request, pk):
+        if request.user.is_authenticated:
+            out = self._vote_changer(Answer, pk, request)
+            return JsonResponse(out)
+        else:
+            return HttpResponseForbidden()
