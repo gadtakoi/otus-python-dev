@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.utils.decorators import method_decorator
 from django.shortcuts import redirect, render
+from django.http import HttpResponse
 from django.views import View
 
 from customuser.forms import SignUpForm, LoginForm, SettingsForm
@@ -58,12 +59,12 @@ class UserLogout(View):
 class UserSettings(View):
     template = 'customuser/settings.html'
 
-    @login_required
+    @method_decorator(login_required)
     def get(self, request):
         form = SettingsForm(instance=request.user)
         return render(request, self.template, {'form': form})
 
-    @login_required
+    @method_decorator(login_required)
     def post(self, request):
         form = SettingsForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
