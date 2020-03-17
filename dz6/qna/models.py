@@ -1,31 +1,9 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.utils.html import escape
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
-from config.settings import MEDIA_URL, ANSWERS_PER_PAGE
-
-
-class User(AbstractUser):
-    email = models.EmailField(_('email address'), blank=False, unique=True)
-    avatar = models.ImageField(upload_to='images/avatars', blank=True, null=True)
-    is_staff = models.BooleanField(default=False)
-
-    def avatar_view(self):
-        if self.avatar:
-            return '{}{}'.format(MEDIA_URL, escape(self.avatar))
-        else:
-            return ''
-
-    def get_full_name(self):
-        if self.first_name or self.last_name:
-            full_name = '%s %s' % (self.first_name, self.last_name)
-        else:
-            full_name = self.username
-        return full_name.strip()
+from config.settings import ANSWERS_PER_PAGE
 
 
 class Question(models.Model):
@@ -63,6 +41,18 @@ class Question(models.Model):
     def show_tags(self):
         return self.tags.all()
 
+    def get_vote_url(self):
+        return reverse('question-vote', kwargs={'pk': self.pk})
+
+    def save(self, tags=(), *args, **kwargs):
+        super(Question, self).save(*args, **kwargs)
+        tag_objects = []
+        for tag in tags:
+            tag_object, _ = Tag.objects.get_or_create(name=tag)
+            tag_objects.append(tag_object)
+        if tag_objects:
+            self.tags.add(*tag_objects)
+
     class Meta:
         verbose_name = 'Вопрос'
         verbose_name_plural = 'Вопросы'
@@ -82,7 +72,14 @@ class Answer(models.Model):
     date_create = models.DateTimeField(verbose_name='Дата написания', auto_now_add=True)
     vote_count = models.IntegerField(verbose_name='Голоса', default=0)
 
-    correct = models.BooleanField(verbose_name='Правильный ответ', default=0)
+    correct = models.BooleanField(verbose_name='Правильный ответ', default=False)
+    sent = models.BooleanField(verbose_name='Письмо отправлено', default=False)
+
+    def get_vote_url(self):
+        return reverse('answer-vote', kwargs={'pk': self.pk})
+
+    def get_correct_url(self):
+        return reverse('answer-correct', kwargs={'pk': self.pk})
 
     def __str__(self):
         return self.content[:40]

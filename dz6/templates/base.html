@@ -19,12 +19,12 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="row container-fluid">
                 <div class="col-4">
-                    <a href="/" class="navbar-brand d-flex align-items-center">
+                    <a href="{% url 'index' %}" class="navbar-brand d-flex align-items-center">
                         <img src="{% static 'qna/images/hasker_logo.png' %} ">
                     </a>
                 </div>
                 <div class="col-5">
-                    <form class="form-inline my-2 my-lg-0" action="/search/">
+                    <form class="form-inline my-2 my-lg-0" action="{% url 'search' %}">
                         <input class="form-control mr-sm- col-md-8" type="search" placeholder="Search" aria-label="Search" name="q" value="{{ q }}">
                         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                     </form>
@@ -33,20 +33,22 @@
                     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                         {% if user.is_authenticated %}
                             <li class="nav-item">
-                                <img src="{{ request.user.avatar_view }}" width="50px"/><br>
+                                {% if request.user.avatar_view %}
+                                    <img src="{{ request.user.avatar_view }}" width="50px"/><br>
+                                {% endif %}
                             </li>
                             <li class="nav-item ml-2">
-                                <a class="nav-link active" href="/settings/"><ins>{{request.user.username}}</ins></a>
+                                <a class="nav-link active" href="{% url 'settings' %}"><ins>{{request.user.get_full_name}}</ins></a>
                             </li>
                             <li class="nav-item mt-1">
-                                <a class="nav-link" href="/logout/"><i class="fa fa-sign-out"></i></a>
+                                <a class="nav-link" href="{% url 'logout' %}"><i class="fa fa-sign-out"></i></a>
                             </li>
                         {% else %}
                             <li class="nav-item">
-                                <a class="nav-link" href="/login/">Log In</a>
+                                <a class="nav-link" href="{% url 'login' %}">Log In</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/signup/">Sign Up</a>
+                                <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
                             </li>
                         {% endif %}
                     </ul>

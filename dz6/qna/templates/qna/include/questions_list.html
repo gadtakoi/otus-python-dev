@@ -4,9 +4,9 @@
         <div class="row">
             <div class="col-1 text-center">{{ question.vote_count }}<br><small class="text-muted">Votes</small></div>
             <div class="col-1 text-center">{{ question.answer_set.count }}<br><small class="text-muted">Answers</small></div>
-            <div class="col-8"><a href="/question/{{question.id}}/">{{ question.title }}</a><br>
+            <div class="col-8"><a href="{% url 'question-detail' question.id %}">{{ question.title }}</a><br>
                 {% for tag in question.tags.all %}
-                <a href="/tag/{{ tag.name }}/" class="badge badge-secondary">{{ tag }}</a>
+                <a href="{% url 'tag' tag.name %}" class="badge badge-secondary">{{ tag }}</a>
                 {% endfor %}
             </div>
             <div class="col">

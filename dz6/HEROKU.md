@@ -24,6 +24,7 @@ PROJECT_PATH=dz6
 ```
 
 ```dotenv
+SECRET_KEY=<secret-key-secret-key-secret-key-secret-key-secret-key>
 EMAIL_FROM_ADDRESS='example@gmail.com'
 EMAIL_HOST='smtp.gmail.com'
 EMAIL_HOST_USER='example@gmail.com'

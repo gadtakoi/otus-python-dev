@@ -1,7 +1,7 @@
-django==3.0.3
+django==3.0.4
 psycopg2==2.8.4
 django-taggit
-Faker==4.0.1
+Faker==4.0.2
 python-dotenv
 dj-database-url
 uwsgi==2.0.18

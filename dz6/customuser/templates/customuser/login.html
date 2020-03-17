@@ -1,9 +1,9 @@
-{% extends 'qna/base.html' %}
+{% extends 'base.html' %}
 {% block content %}
 <div class="container">
     <div class="row mt-2">
         <div class="col-9">
-            <h1>Sign Up</h1>
+            <h1>Log In</h1>
         </div>
         <div class="col">
             {% include "qna/include/ask_button.html" %}
@@ -11,7 +11,7 @@
     </div>
     <div class="row">
         <div class="col-9">
-            {% include "qna/include/signup_form.html" %}
+            {% include "customuser/include/login_form.html" %}
         </div>
         <div class="col-3">
             {% include "qna/include/trending.html" %}

@@ -1,8 +1,7 @@
 from django.contrib import admin
 
-from qna.models import Question, Answer, Tag, User
+from qna.models import Question, Answer, Tag
 
 admin.site.register(Question)
 admin.site.register(Answer)
 admin.site.register(Tag)
-admin.site.register(User)

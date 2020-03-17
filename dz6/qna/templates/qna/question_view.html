@@ -1,10 +1,10 @@
-{% extends 'qna/base.html' %}
+{% extends 'base.html' %}
 {% block content %}
 <div class="container">
     <div class="row mt-2">
         <div class="col-9">
             <h1>{{ question.title }}</h1>
-            {% if question.author == request.user %}<a href="/question/{{ question.id }}/edit/">edit</a>{% endif %}
+            {% if question.author == request.user %}<a href="{% url 'question-detail' question.id %}edit/">edit</a>{% endif %}
         </div>
         <div class="col-2">
             {% include "qna/include/ask_button.html" %}
@@ -31,7 +31,7 @@
                     <div class="row">
                         <div class="col-9">
                             {% for tag in question.tags.all %}
-                            <a href="/tag/{{ tag.name }}/" class="badge badge-secondary">{{ tag }}</a>
+                            <a href="{% url 'tag' tag.name %}" class="badge badge-secondary">{{ tag }}</a>
                             {% endfor %}
 
                         </div>
