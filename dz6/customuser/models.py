@@ -1,72 +1,25 @@
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.shortcuts import redirect, render
-from django.views import View
-from customuser.user import User
-from customuser.forms import SignUpForm, LoginForm, SettingsForm
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.utils.html import escape
+from django.utils.translation import gettext_lazy as _
+from config.settings import MEDIA_URL
 
 
-class UserSignup(View):
-    template = 'customuser/signup.html'
+class User(AbstractUser):
+    email = models.EmailField(_('email address'), blank=False, unique=True)
+    avatar = models.ImageField(upload_to='images/avatars', blank=True, null=True)
+    fio = models.CharField(verbose_name='ФИО', max_length=255, null=True, blank=True)
+    is_staff = models.BooleanField(default=False)
 
-    def get(self, request):
-        form = SignUpForm()
-        return render(request, self.template, {'form': form})
+    def avatar_view(self):
+        if self.avatar:
+            return '{}{}'.format(MEDIA_URL, escape(self.avatar))
 
-    def post(self, request):
-        form = SignUpForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('index')
-        return render(request, self.template, {'form': form})
-
-
-class UserLogin(View):
-    template = 'customuser/login.html'
-
-    def get(self, request):
-        form = LoginForm()
-        return render(request, self.template, {'form': form})
-
-    def post(self, request):
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(username=username, password=password)
-        if user:
-            if user.is_active:
-                login(request, user)
-                return redirect('index')
-            else:
-                return HttpResponse("403")
+    def get_full_name(self):
+        if self.fio:
+            full_name = self.fio
+        elif self.first_name or self.last_name:
+            full_name = '{} {}'.format(self.first_name, self.last_name)
         else:
-            form = LoginForm(request)
-            return render(request, self.template,
-                          {'form': form, 'errors': form.get_invalid_login_error().message})
-
-
-class UserLogout(View):
-    def get(self, request):
-        logout(request)
-        return redirect('index')
-
-
-class UserSettings(View):
-    template = 'customuser/settings.html'
-
-    @login_required
-    def get(self, request):
-        form = SettingsForm(instance=request.user)
-        return render(request, self.template, {'form': form})
-
-    @login_required
-    def post(self, request):
-        form = SettingsForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return redirect('settings')
-        return render(request, self.template, {'form': form})
+            full_name = self.username
+        return full_name.strip()
