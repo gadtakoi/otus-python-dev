@@ -85,7 +85,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/tmp/static/'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/tmp/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '../media')
 
 AUTH_USER_MODEL = 'customuser.User'
 
@@ -97,6 +97,7 @@ TAG_PER_PAGE = 20
 ANSWERS_PER_PAGE = 30
 
 django_heroku.settings(locals())
+del DATABASES['default']['OPTIONS']['sslmode']
 
 try:
     from .local import *
