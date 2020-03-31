@@ -1,9 +1,18 @@
-# pip3 install -r requirements.txt
+### Requirements
+Python 3.8
+requirements.txt
+memcached
 
-# memcached -l 0.0.0.0:33013,0.0.0.0:33014,0.0.0.0:33015,0.0.0.0:33016
+```shell script
+memcached -l 0.0.0.0:33013,0.0.0.0:33014,0.0.0.0:33015,0.0.0.0:33016
+```
+or
+```shell script
+docker-compose up
+```
 
-# python memc_load.py --pattern=/home/stas/otus/otus-python-dev/dz9/gz/*.tsv.gz
+### Run
+python memc_load.py --pattern=data/*.tsv.gz
 
-# telnet localhost 11211
 
 
