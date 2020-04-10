@@ -16,7 +16,7 @@ BASE_URL = 'https://news.ycombinator.com'
 POST_URL = '{}/item?id={}'.format(BASE_URL, '{}')
 OUTPUT_FOLDER = 'data'
 URL_PATTERN = re.compile(r'^https?://')
-INTERVAL = 30
+INTERVAL = 60
 LIMIT_PER_HOST = 3
 REQUEST_TIMEOUT = 10
 HEADERS = {
@@ -110,10 +110,7 @@ async def handle_post(post, output_dir):
 async def handle_main_page(output_dir):
     response = await download_page(BASE_URL, output_dir, 'main')
     content = response.content
-
-    posts = [
-        post for post in parse_main_page(content)
-    ]
+    posts = parse_main_page(content)
     logging.info('Handle main page')
 
     tasks = []
@@ -125,7 +122,7 @@ async def handle_main_page(output_dir):
 async def main(output_folder, interval):
     while True:
         try:
-            await asyncio.wait_for(handle_main_page(output_folder), timeout=interval)
+            await handle_main_page(output_folder)
         except Exception as e:
             logging.error('Crawler failed: {}'.format(e))
         await asyncio.sleep(interval)
